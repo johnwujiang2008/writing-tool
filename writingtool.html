@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创意写作助手 | DeepSeek AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // 主色调：深蓝黄色
+                        secondary: '#EC4899', // 辅助色：红色
+                        accent: '#8B5CF6', // 强调色：绿色
+                        neutral: '#F3F4F6', // 中性色：浅灰
+                        dark: '#1F2937', // 深色：深灰
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Merriweather', 'Georgia', 'serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                },
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .writing-mode-vertical {
+                writing-mode: vertical-rl;
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+            }
+            .gradient-text {
+                @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-neutral-50 to-neutral-100 min-h-screen font-sans text-dark">
+    <!-- 导航栏 -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 bg-blur shadow-sm transition-all duration-300">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-feather text-primary text-2xl"></i>
+                <h1 class="text-xl font-bold gradient-text">创意写作助手</h1>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#" class="text-dark/70 hover:text-primary transition-colors duration-300">首页</a>
+                <a href="#" class="text-dark/70 hover:text-primary transition-colors duration-300">作品库</a>
+                <a href="#" class="text-dark/70 hover:text-primary transition-colors duration-300">使用指南</a>
+                <a href="#" class="text-dark/70 hover:text-primary transition-colors duration-300">关于我们</a>
+            </nav>
+            <button class="md:hidden text-dark/70 hover:text-primary transition-colors">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 pt-24 pb-16">
+        <!-- 欢迎区域 -->
+        <section id="welcome" class="text-center max-w-4xl mx-auto mb-16 animate-fade-in">
+            <div class="relative mb-8">
+                <div class="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-3xl -z-10"></div>
+                <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-dark mb-6 leading-tight text-shadow">
+                    用<span class="gradient-text">AI</span>点燃你的创作灵感
+                </h2>
+                <p class="text-lg text-dark/70 mb-8 max-w-2xl mx-auto">
+                    选择你想创作的文学形式，输入主题或关键词，借助DeepSeek强大的AI能力，瞬间生成富有灵感的作品
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <button id="poetry-btn" class="writing-type-btn bg-primary/5 hover:bg-primary/10 text-primary border border-primary/20 rounded-xl p-8 w-full card-hover transition-all duration-300 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-book-open text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">诗歌</h3>
+                    <p class="text-dark/70 text-center">用凝练的语言表达情感与意象</p>
+                </button>
+                <button id="essay-btn" class="writing-type-btn bg-secondary/5 hover:bg-secondary/10 text-secondary border border-secondary/20 rounded-xl p-8 w-full card-hover transition-all duration-300 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-scroll text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">散文</h3>
+                    <p class="text-dark/70 text-center">自由表达思想与感悟的文学体裁</p>
+                </button>
+                <button id="novel-btn" class="writing-type-btn bg-accent/5 hover:bg-accent/10 text-accent border border-accent/20 rounded-xl p-8 w-full card-hover transition-all duration-300 flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+                        <i class="fa-solid fa-book text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">小说</h3>
+                    <p class="text-dark/70 text-center">构建虚构故事与人物的文学形式</p>
+                </button>
+            </div>
+        </section>
+
+        <!-- 诗歌创作表单 -->
+        <section id="poetry-form" class="hidden max-w-3xl mx-auto mb-16 animate-slide-up">
+            <div class="bg-white rounded-2xl shadow-md p-8 border border-neutral-200 relative overflow-hidden">
+                <div class="absolute -top-16 -right-16 w-32 h-32 bg-primary/10 rounded-full"></div>
+                <div class="absolute -bottom-16 -left-16 w-32 h-32 bg-primary/10 rounded-full"></div>
+                
+                <div class="flex justify-between items-center mb-6 relative z-10">
+                    <h2 class="text-2xl font-bold text-primary">诗歌创作</h2>
+                    <button id="back-to-selection" class="text-dark/60 hover:text-dark transition-colors">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> 返回
+                    </button>
+                </div>
+                
+                <div class="space-y-6 relative z-10">
+                    <div>
+                        <label for="poem-theme" class="block text-sm font-medium text-dark/80 mb-2">诗歌主题</label>
+                        <input type="text" id="poem-theme" class="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all" placeholder="例如：春日、离别、梦想...">
+                    </div>
+                    
+                    <div>
+                        <label for="poem-style" class="block text-sm font-medium text-dark/80 mb-2">诗歌风格</label>
+                        <select id="poem-style" class="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all">
+                            <option value="自由诗">自由诗</option>
+                            <option value="散文诗">散文诗</option>
+                            <option value="抒情诗">抒情诗</option>
+                            <option value="叙事诗">叙事诗</option>
+                            <option value="哲理诗">哲理诗</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-dark/80 mb-2">诗歌长度</label>
+                        <div class="grid grid-cols-3 gap-4">
+                            <label class="inline-flex items-center p-3 border border-neutral-300 rounded-lg cursor-pointer hover:bg-neutral-50 transition-colors">
+                                <input type="radio" name="poem-length" value="short" class="w-4 h-4 text-primary focus:ring-primary border-neutral-300" checked>
+                                <span class="ml-2 text-sm text-dark/80">短篇 (4-8行)</span>
+                            </label>
+                            <label class="inline-flex items-center p-3 border border-neutral-300 rounded-lg cursor-pointer hover:bg-neutral-50 transition-colors">
+                                <input type="radio" name="poem-length" value="medium" class="w-4 h-4 text-primary focus:ring-primary border-neutral-300">
+                                <span class="ml-2 text-sm text-dark/80">中篇 (10-16行)</span>
+                            </label>
+                            <label class="inline-flex items-center p-3 border border-neutral-300 rounded-lg cursor-pointer hover:bg-neutral-50 transition-colors">
+                                <input type="radio" name="poem-length" value="long" class="w-4 h-4 text-primary focus:ring-primary border-neutral-300">
+                                <span class="ml-2 text-sm text-dark/80">长篇 (18-24行)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button id="generate-poem" class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center group">
+                        <i class="fa-solid fa-magic-wand mr-2 group-hover:animate-spin transition-transform duration-500"></i>
+                        <span>生成诗歌</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 散文创作表单 -->
+        <section id="essay-form" class="hidden max-w-3xl mx-auto mb-16 animate-slide-up">
+            <div class="bg-white rounded-2xl shadow-md p-8 border border-neutral-200 relative overflow-hidden">
+                <div class="absolute -top-16 -right-16 w-32 h-32 bg-secondary/10 rounded-full"></div>
+                <div class="absolute -bottom-16 -left-16 w-32 h-32 bg-secondary/10 rounded-full"></div>
+                
+                <div class="flex justify-between items-center mb-6 relative z-10">
+                    <h2 class="text-2xl font-bold text-secondary">散文创作</h2>
+                    <button id="back-to-selection-essay" class="text-dark/60 hover:text-dark transition-colors">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> 返回
+                    </button>
+                </div>
+                
+                <div class="space-y-6 relative z-10">
+                    <div>
+                        <label for="essay-topic" class="block text-sm font-medium text-dark/80 mb-2">散文主题</label>
+                        <input type="text" id="essay-topic" class="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all" placeholder="例如：生活感悟、旅行见闻、自然风景...">
+                    </div>
+                    
+                    <div>
+                        <label for="essay-tone" class="block text-sm font-medium text-dark/80 mb-2">散文风格</label>
+                        <select id="essay-tone" class="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all">
+                            <option value="抒情">抒情</option>
+                            <option value="叙事">叙事</option>
+                            <option value="议论">议论</option>
+                            <option value="写景">写景</option>
+                            <option value="哲理">哲理</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-dark/80 mb-2">散文长度</label>
+                        <div class="grid grid-cols-3 gap-4">
+                            <label class="inline-flex items-center p-3 border border-neutral-300 rounded-lg cursor-pointer hover:bg-neutral-50 transition-colors">
+                                <input type="radio" name="essay-length" value="short" class="w-4 h-4 text-secondary focus:ring-secondary border-neutral-300" checked>
+                                <span class="ml-2 text-sm text-dark/80">短篇 (300-500字)</span>
+                            </label>
+                            <label class="inline-flex items-center p-3 border border-neutral-300 rounded-lg cursor-pointer hover:bg-neutral-50 transition-colors">
+                                <input type="radio" name="essay-length" value="medium" class="w-4 h-4 text-secondary focus:ring-secondary border-neutral-300">
+                                <span class="ml-2 text-sm text-dark/80">中篇 (800-1200字)</span>
+                            </label>
+                            <label class="inline-flex items-center p-3 border border-neutral-300 rounded-lg cursor-pointer hover:bg-neutral-50 transition-colors">
+                                <input type="radio" name="essay-length" value="long" class="w-4 h-4 text-secondary focus:ring-secondary border-neutral-300">
+                                <span class="ml-2 text-sm text-dark/80">长篇 (1500-2000字)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button id="generate-essay" class="w-full bg-secondary hover:bg-secondary/90 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center group">
+                        <i class="fa-solid fa-magic-wand mr-2 group-hover:animate-spin transition-transform duration-500"></i>
+                        <span>生成散文</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 小说创作表单 -->
+        <section id="novel-form" class="hidden max-w-3xl mx-auto mb-16 animate-slide-up">
+            <div class="bg-white rounded-2xl shadow-md p-8 border border-neutral-200 relative overflow-hidden">
+                <div class="absolute -top-16 -right-16 w-32 h-32 bg-accent/10 rounded-full"></div>
+                <div class="absolute -bottom-16 -left-16 w-32 h-32 bg-accent/10 rounded-full"></div>
+                
+                <div class="flex justify-between items-center mb-6 relative z-10">
+                    <h2 class="text-2xl font-bold text-accent">小说创作</h2>
+                    <button id="back-to-selection-novel" class="text-dark/60 hover:text-dark transition-colors">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> 返回
+                    </button>
+                </div>
+                
+                <div class="space-y-6 relative z-10">
+                    <div>
+                        <label for="novel-characters" class="block text-sm font-medium text-dark/80 mb-2">主要人物</label>
+                        <input type="text" id="novel-characters" class="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:ring-2 focus:ring-accent/50 focus:border-accent outline-none transition-all" placeholder="例如：勇敢的探险家、神秘的陌生人、智慧的老者...">
+                    </div>
+                    
+                    <div>
+                        <label for="novel-setting" class="block text-sm font-medium text-dark/80 mb-2">故事背景</label>
+                        <input type="text" id="novel-setting" class="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:ring-2 focus:ring-accent/50 focus:border-accent outline-none transition-all" placeholder="例如：古老的城堡、未来的太空站、神秘的森林...">
+                    </div>
+                    
+                    <div>
+                        <label for="novel-theme" class="block text-sm font-medium text-dark/80 mb-2">故事主题</label>
+                        <input type="text" id="novel-theme" class="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:ring-2 focus:ring-accent/50 focus:border-accent outline-none transition-all" placeholder="例如：爱情、复仇、成长、冒险...">
+                    </div>
+                    
+                    <div>
+                        <label for="novel-genre" class="block text-sm font-medium text-dark/80 mb-2">小说类型</label>
+                        <select id="novel-genre" class="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:ring-2 focus:ring-accent/50 focus:border-accent outline-none transition-all">
+                            <option value="奇幻">奇幻</option>
+                            <option value="科幻">科幻</option>
+                            <option value="悬疑">悬疑</option>
+                            <option value="爱情">爱情</option>
+                            <option value="冒险">冒险</option>
+                            <option value="历史">历史</option>
+                        </select>
+                    </div>
+                    
+                    <button id="generate-novel" class="w-full bg-accent hover:bg-accent/90 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center group">
+                        <i class="fa-solid fa-magic-wand mr-2 group-hover:animate-spin transition-transform duration-500"></i>
+                        <span>生成小说</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 创作结果展示 -->
+        <section id="result-section" class="hidden max-w-4xl mx-auto animate-slide-up">
+            <div class="bg-white rounded-2xl shadow-md p-8 border border-neutral-200">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="result-title" class="text-2xl font-bold text-primary">创作结果</h2>
+                    <button id="back-to-form" class="text-dark/60 hover:text-dark transition-colors">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> 返回
+                    </button>
+                </div>
+                
+                <div id="result-content" class="prose prose-lg max-w-none mb-8 text-dark/80 leading-relaxed bg-neutral-50 p-6 rounded-xl">
+                    <!-- 生成的内容将在这里显示 -->
+                </div>
+                
+                <div class="flex flex-wrap gap-4">
+                    <button id="regenerate" class="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg transition-all duration-300 flex items-center group">
+                        <i class="fa-solid fa-refresh mr-2 group-hover:animate-spin transition-transform duration-500"></i>
+                        <span>重新生成</span>
+                    </button>
+                    
+                    <button id="save-to-file" class="bg-neutral-200 hover:bg-neutral-300 text-dark font-medium py-2 px-6 rounded-lg transition-all duration-300 flex items-center">
+                        <i class="fa-solid fa-download mr-2"></i>
+                        <span>保存到文件</span>
+                    </button>
+                    
+                    <button id="share" class="bg-neutral-200 hover:bg-neutral-300 text-dark font-medium py-2 px-6 rounded-lg transition-all duration-300 flex items-center">
+                        <i class="fa-solid fa-share-alt mr-2"></i>
+                        <span>分享</span>
+                    </button>
+                    
+                    <button id="edit-content" class="bg-neutral-200 hover:bg-neutral-300 text-dark font-medium py-2 px-6 rounded-lg transition-all duration-300 flex items-center">
+                        <i class="fa-solid fa-pencil mr-2"></i>
+                        <span>编辑内容</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white/70 py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i class="fa-solid fa-feather text-primary text-xl"></i>
+                        <span class="text-white font-bold">创意写作助手</span>
+                    </div>
+                    <p class="text-sm">由John Wu提供支持</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-primary transition-colors duration-300">
+                        <i class="fa-brands fa-github text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:text-primary transition-colors duration-300">
+                        <i class="fa-brands fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:text-primary transition-colors duration-300">
+                        <i class="fa-brands fa-instagram text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-6 text-center text-sm">
+                <p>&copy; 2025 创意写作助手. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 加载中模态框 -->
+    <div id="loading-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full text-center relative overflow-hidden">
+            <div class="absolute -top-16 -right-16 w-32 h-32 bg-primary/10 rounded-full"></div>
+            <div class="absolute -bottom-16 -left-16 w-32 h-32 bg-primary/10 rounded-full"></div>
+            
+            <div class="relative z-10">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mx-auto mb-4"></div>
+                <h3 class="text-xl font-bold text-primary mb-2">AI正在创作...</h3>
+                <p class="text-dark/70 mb-4">请稍候，我们的AI正在构思您的作品...</p>
+                <div class="w-full bg-neutral-200 rounded-full h-2.5 mb-4">
+                    <div class="bg-primary h-2.5 rounded-full" style="width: 0%" id="progress-bar"></div>
+                </div>
+                <p class="text-sm text-dark/60" id="progress-text">思考中...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑模态框 -->
+    <div id="edit-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-primary">编辑内容</h3>
+                <button id="close-edit-modal" class="text-dark/60 hover:text-dark transition-colors">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            <textarea id="edit-content" class="w-full h-64 p-4 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all mb-4"></textarea>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-edit" class="px-4 py-2 bg-neutral-200 hover:bg-neutral-300 rounded-lg transition-colors">
+                    取消
+                </button>
+                <button id="save-edit" class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors">
+                    保存修改
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API配置 - 使用您提供的DeepSeek API密钥
+        const DEEPSEEK_API_KEY = "sk-9a5515f717c2444b82951f23b342c11b";
+        const DEEPSEEK_API_ENDPOINT = "https://api.deepseek.com/v1/chat/completions";
+
+        // DOM元素
+        const welcomeSection = document.getElementById('welcome');
+        const poetryForm = document.getElementById('poetry-form');
+        const essayForm = document.getElementById('essay-form');
+        const novelForm = document.getElementById('novel-form');
+        const resultSection = document.getElementById('result-section');
+        const resultTitle = document.getElementById('result-title');
+        const resultContent = document.getElementById('result-content');
+        const loadingModal = document.getElementById('loading-modal');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const editModal = document.getElementById('edit-modal');
+        const editContent = document.getElementById('edit-content');
+
+        // 写作类型按钮
+        const poetryBtn = document.getElementById('poetry-btn');
+        const essayBtn = document.getElementById('essay-btn');
+        const novelBtn = document.getElementById('novel-btn');
+
+        // 返回按钮
+        const backToSelection = document.getElementById('back-to-selection');
+        const backToSelectionEssay = document.getElementById('back-to-selection-essay');
+        const backToSelectionNovel = document.getElementById('back-to-selection-novel');
+        const backToForm = document.getElementById('back-to-form');
+
+        // 生成按钮
+        const generatePoem = document.getElementById('generate-poem');
+        const generateEssay = document.getElementById('generate-essay');
+        const generateNovel = document.getElementById('generate-novel');
+
+        // 结果操作按钮
+        const regenerateBtn = document.getElementById('regenerate');
+        const saveToFileBtn = document.getElementById('save-to-file');
+        const shareBtn = document.getElementById('share');
+        const editContentBtn = document.getElementById('edit-content');
+
+        // 编辑模态框按钮
+        const closeEditModal = document.getElementById('close-edit-modal');
+        const cancelEdit = document.getElementById('cancel-edit');
+        const saveEdit = document.getElementById('save-edit');
+
+        // 当前写作类型
+        let currentWritingType = '';
+        let currentContent = '';
+        let currentPrompt = '';
+
+        // 显示诗歌表单
+        poetryBtn.addEventListener('click', () => {
+            welcomeSection.classList.add('hidden');
+            poetryForm.classList.remove('hidden');
+            currentWritingType = 'poetry';
+            // 平滑滚动到表单
+            poetryForm.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // 显示散文表单
+        essayBtn.addEventListener('click', () => {
+            welcomeSection.classList.add('hidden');
+            essayForm.classList.remove('hidden');
+            currentWritingType = 'essay';
+            essayForm.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // 显示小说表单
+        novelBtn.addEventListener('click', () => {
+            welcomeSection.classList.add('hidden');
+            novelForm.classList.remove('hidden');
+            currentWritingType = 'novel';
+            novelForm.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // 返回欢迎页面
+        backToSelection.addEventListener('click', () => {
+            poetryForm.classList.add('hidden');
+            welcomeSection.classList.remove('hidden');
+            welcomeSection.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        backToSelectionEssay.addEventListener('click', () => {
+            essayForm.classList.add('hidden');
+            welcomeSection.classList.remove('hidden');
+            welcomeSection.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        backToSelectionNovel.addEventListener('click', () => {
+            novelForm.classList.add('hidden');
+            welcomeSection.classList.remove('hidden');
+            welcomeSection.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        backToForm.addEventListener('click', () => {
+            resultSection.classList.add('hidden');
+            if (currentWritingType === 'poetry') {
+                poetryForm.classList.remove('hidden');
+                poetryForm.scrollIntoView({ behavior: 'smooth' });
+            } else if (currentWritingType === 'essay') {
+                essayForm.classList.remove('hidden');
+                essayForm.scrollIntoView({ behavior: 'smooth' });
+            } else if (currentWritingType === 'novel') {
+                novelForm.classList.remove('hidden');
+                novelForm.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // 生成诗歌
+        generatePoem.addEventListener('click', async () => {
+            const theme = document.getElementById('poem-theme').value.trim();
+            const style = document.getElementById('poem-style').value;
+            const lengthRadios = document.getElementsByName('poem-length');
+            let length = 'short';
+            for (const radio of lengthRadios) {
+                if (radio.checked) {
+                    length = radio.value;
+                    break;
+                }
+            }
+            
+            if (!theme) {
+                alert('请输入诗歌主题');
+                return;
+            }
+            
+            // 构建提示词
+            const lengthDesc = {
+                'short': '短诗（4-8行）',
+                'medium': '中等长度诗歌（10-16行）',
+                'long': '长诗（18-24行）'
+            };
+            
+            currentPrompt = `请创作一首${style}风格的${lengthDesc[length]}，主题是"${theme}"。
+要求：
+1. 语言优美，富有意象和节奏感
+2. 情感真挚，主题明确
+3. 使用适当的修辞手法
+4. 结构完整，有开头、发展和结尾`;
+            
+            try {
+                await generateContent(currentPrompt, `${style}：${theme}`, 'poetry');
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        // 生成散文
+        generateEssay.addEventListener('click', async () => {
+            const topic = document.getElementById('essay-topic').value.trim();
+            const tone = document.getElementById('essay-tone').value;
+            const lengthRadios = document.getElementsByName('essay-length');
+            let length = 'short';
+            for (const radio of lengthRadios) {
+                if (radio.checked) {
+                    length = radio.value;
+                    break;
+                }
+            }
+            
+            if (!topic) {
+                alert('请输入散文主题');
+                return;
+            }
+            
+            // 构建提示词
+            const lengthDesc = {
+                'short': '短文（300-500字）',
+                'medium': '中等长度散文（800-1200字）',
+                'long': '长散文（1500-2000字）'
+            };
+            
+            const toneDesc = {
+                '抒情': '情感丰富、富有感染力',
+                '叙事': '情节生动、人物鲜明',
+                '议论': '观点明确、逻辑严密',
+                '写景': '描写细腻、意境优美',
+                '哲理': '思想深刻、富有启示'
+            };
+            
+            currentPrompt = `请创作一篇${tone}风格的${lengthDesc[length]}，主题是"${topic}"。
+要求：
+1. ${toneDesc[tone]}
+2. 结构清晰，层次分明
+3. 语言流畅，用词准确
+4. 表达独特的见解或感受`;
+            
+            try {
+                await generateContent(currentPrompt, `${tone}散文：${topic}`, 'essay');
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        // 生成小说
+        generateNovel.addEventListener('click', async () => {
+            const characters = document.getElementById('novel-characters').value.trim();
+            const setting = document.getElementById('novel-setting').value.trim();
+            const theme = document.getElementById('novel-theme').value.trim();
+            const genre = document.getElementById('novel-genre').value;
+            
+            if (!characters || !setting || !theme) {
+                alert('请填写人物、地点和主题');
+                return;
+            }
+            
+            // 构建提示词
+            currentPrompt = `请创作一篇${genre}小说片段，包含以下元素：
+- 主要人物：${characters}
+- 故事背景：${setting}
+- 主题：${theme}
+
+要求：
+1. 情节引人入胜，有明确的冲突和悬念
+2. 人物性格鲜明，对话自然流畅
+3. 环境描写生动，营造出${setting}的氛围
+4. 开头引人入胜，能够吸引读者继续阅读
+5. 约500-800字的小说片段`;
+            
+            try {
+                await generateContent(currentPrompt, `${genre}小说：${theme}`, 'novel');
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        // 重新生成
+        regenerateBtn.addEventListener('click', async () => {
+            if (!currentPrompt) {
+                alert('没有可重新生成的内容');
+                return;
+            }
+            
+            try {
+                const title = resultTitle.textContent;
+                await generateContent(currentPrompt, title, currentWritingType);
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        // 保存到文件
+        saveToFileBtn.addEventListener('click', () => {
+            if (!currentContent) {
+                alert('没有可保存的内容');
+                return;
+            }
+            
+            const title = resultTitle.textContent;
+            const fileName = title.replace(/[^\w\s]/gi, '_').replace(/\s+/g, '_') + '.txt';
+            const blob = new Blob([currentContent], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = fileName;
+            a.click();
+        });
+
+        // 分享功能
+        shareBtn.addEventListener('click', () => {
+            if (!currentContent) {
+                alert('没有可分享的内容');
+                return;
+            }
+            
+            // 复制内容到剪贴板
+            navigator.clipboard.writeText(currentContent)
+                .then(() => {
+                    alert('内容已复制到剪贴板！');
+                })
+                .catch(err => {
+                    console.error('无法复制内容: ', err);
+                    alert('复制失败，请手动复制内容');
+                });
+        });
+
+        // 编辑内容
+        editContentBtn.addEventListener('click', () => {
+            if (!currentContent) {
+                alert('没有可编辑的内容');
+                return;
+            }
+            
+            editContent.value = currentContent;
+            editModal.classList.remove('hidden');
+        });
+
+        // 关闭编辑模态框
+        closeEditModal.addEventListener('click', () => {
+            editModal.classList.add('hidden');
+        });
+
+        // 取消编辑
+        cancelEdit.addEventListener('click', () => {
+            editModal.classList.add('hidden');
+        });
+
+        // 保存编辑
+        saveEdit.addEventListener('click', () => {
+            currentContent = editContent.value;
+            resultContent.innerHTML = `<pre class="font-serif whitespace-pre-wrap">${currentContent}</pre>`;
+            editModal.classList.add('hidden');
+        });
+
+        // 生成内容的函数
+        async function generateContent(prompt, title, type) {
+            // 显示加载中模态框
+            loadingModal.classList.remove('hidden');
+            progressBar.style.width = '0%';
+            progressText.textContent = '正在思考...';
+            
+            try {
+                // 模拟进度条
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress > 90) {
+                        progress = 90;
+                        clearInterval(progressInterval);
+                    }
+                    progressBar.style.width = `${progress}%`;
+                    
+                    const messages = [
+                        '正在构思...',
+                        '寻找灵感...',
+                        '组织语言...',
+                        '创作中...',
+                        '润色文本...'
+                    ];
+                    progressText.textContent = messages[Math.floor(Math.random() * messages.length)];
+                }, 300);
+                
+                // 调用DeepSeek API
+                const response = await fetch(DEEPSEEK_API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek-chat',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `你是一位才华横溢的作家。请根据用户需求创作${type === 'poetry' ? '诗歌' : type === 'essay' ? '散文' : '小说'}。要求语言优美、富有感染力，符合文学创作规范。`
+                            },
+                            {
+                                role: 'user',
+                                content: prompt
+                            }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: type === 'poetry' ? 300 : type === 'essay' ? 1500 : 2000,
+                        stream: false
+                    })
+                });
+                
+                clearInterval(progressInterval);
+                progressBar.style.width = '100%';
+                progressText.textContent = '完成！';
+                
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const content = data.choices[0].message.content.trim();
+                
+                // 更新结果显示
+                resultTitle.textContent = title;
+                
+                // 根据内容类型调整显示格式
+                if (type === 'poetry') {
+                    // 诗歌格式处理：保留换行
+                    resultContent.innerHTML = `<pre class="font-serif whitespace-pre-wrap">${content}</pre>`;
+                } else if (type === 'novel') {
+                    // 小说格式处理：分段显示
+                    const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim()).map(p => `<p>${p}</p>`).join('');
+                    resultContent.innerHTML = `<div class="font-serif leading-relaxed">${paragraphs}</div>`;
+                } else {
+                    // 散文格式处理：保留段落结构
+                    const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim()).map(p => `<p>${p}</p>`).join('');
+                    resultContent.innerHTML = `<div class="font-serif leading-relaxed">${paragraphs}</div>`;
+                }
+                
+                // 保存当前内容
+                currentContent = content;
+                currentWritingType = type;
+                
+                // 隐藏加载模态框
+                setTimeout(() => {
+                    loadingModal.classList.add('hidden');
+                    
+                    // 显示结果部分
+                    if (resultSection.classList.contains('hidden')) {
+                        resultSection.classList.remove('hidden');
+                        resultSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 500);
+                
+            } catch (error) {
+                console.error('生成内容失败:', error);
+                clearInterval(progressInterval);
+                loadingModal.classList.add('hidden');
+                throw new Error('内容生成失败，请重试或检查API密钥');
+            }
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>    
